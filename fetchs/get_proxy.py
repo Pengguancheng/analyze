@@ -18,10 +18,10 @@ class ProxyGet:
 
     def getProxyIp(self):
         proxy = []
-        for i in range(1, 2):
+        for i in range(1, 4):
             try:
                 url = 'http://www.xicidaili.com/nn/' + str(i)
-                #url = "http://www.cc.chu.edu.tw/~u8704002/My%20Webs/content1/proxy.htm"
+                # url = "http://www.cc.chu.edu.tw/~u8704002/My%20Webs/content1/proxy.htm"
                 req = requests.get(url, headers=header)
                 res = req.content
                 soup = BeautifulSoup(res, "lxml")
@@ -41,7 +41,7 @@ class ProxyGet:
 
     def validateIp(self, proxy):
         url = "http://ip.chinaz.com/getip.aspx"
-        url = "http://www.twse.com.tw/exchangeReport/STOCK_DAY/?response=json&date=201801&stockNo=6591"
+        url = "http://www.twse.com.tw/exchangeReport/STOCK_DAY/?response=json&date=201800&stockNo=6591"
         socket.setdefaulttimeout(3)
         proxy_ip = []
         for i in range(0, len(proxy)):
@@ -50,11 +50,11 @@ class ProxyGet:
                 proxy_host = "http://" + ip[0] + ":" + ip[1]
                 proxy_temp = {"http": proxy_host}
                 print('test : ' + proxy[i])
-                res = requests.get(url, proxies=proxy_temp, timeout=1).content
-                res.json()
+                res = requests.get(url, proxies=proxy_temp, timeout=1, headers=header)
+                json = res.json()
                 print(proxy[i])
                 proxy_ip.append(proxy_temp)
-                if len(proxy_ip) > 3:#要刪掉
+                if len(proxy_ip) > 20:  # 要刪掉
                     return proxy_ip
             except Exception:
                 continue

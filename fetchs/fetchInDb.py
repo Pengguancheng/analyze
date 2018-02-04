@@ -37,7 +37,6 @@ class Data:
                                    'turnover': line.turnover, 'open': line.open, 'high': line.high, 'low': line.low,
                                    'close': line.close, 'change': line.change, 'transaction': line.transaction}
                     day_collect.insert(insert_dict)
-                # sleep(randint(1, 7))
             if month == 12:
                 year += 1
             else:
@@ -57,4 +56,4 @@ class Data:
 
 if __name__ == '__main__':
     data = Data()
-    data.form_old(2015, 1)
+    data.form_old(2016, 1)

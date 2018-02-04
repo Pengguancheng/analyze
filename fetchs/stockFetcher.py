@@ -36,13 +36,16 @@ class TWSEFetcher(BaseFetcher):
         pass
 
     def fetch(self, year: int, month: int, sid: str, proxys, retry=5):
-        params = {'date': '%d%02d01' % (year, month), 'stockNo': sid, 'response':'json'}
+        params = {'date': '%d%02d01' % (year, month), 'stockNo': sid, 'response': 'json'}
+        # self.REPORT_URL = "http://www.twse.com.tw/exchangeReport/STOCK_DAY/?response=json&date={date}01&stockNo={" \
+        #                   "stockNo}".format(
+        #     date='%d%02d' % (year, month), stockNo=sid)
         i = 0
         while True:
             try:
                 rand = randint(0, len(proxys))
-                proxies = {"http": proxys[rand], "https": proxys[rand]} #, proxies=proxies
-                r = requests.get(self.REPORT_URL, params=params, timeout=3,
+                proxies = proxys[rand]  # , params=params
+                r = requests.get(self.REPORT_URL, timeout=3, params=params,
                                  headers=self.get_header(), proxies=proxies)
                 break
             except Exception:
@@ -84,13 +87,6 @@ class TWSEFetcher(BaseFetcher):
 
     def get_header(self):
 
-        headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            "Accept-Encoding": 'gzip, deflate',
-            'Accept-Language': 'zh-CN,zh;q=0.8',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'
-
-        }
-        return headers
+        User_Agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'
+        header = {'User-Agent': User_Agent}
+        return header
