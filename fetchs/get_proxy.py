@@ -54,7 +54,7 @@ class ProxyGet:
                 json = res.json()
                 print(proxy[i])
                 proxy_ip.append(proxy_temp)
-                if len(proxy_ip) > 20:  # 要刪掉
+                if len(proxy_ip) > 10:  # 要刪掉
                     return proxy_ip
             except Exception:
                 continue

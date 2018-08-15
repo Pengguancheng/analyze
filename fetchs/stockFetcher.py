@@ -5,7 +5,8 @@ import json
 import urllib.parse
 from collections import namedtuple
 from random import randint
-
+import os
+import csv
 import requests
 
 TWSE_BASE_URL = 'http://www.twse.com.tw/'
@@ -14,42 +15,28 @@ DATATUPLE = namedtuple('Data', ['date', 'capacity', 'turnover', 'open',
                                 'high', 'low', 'close', 'change', 'transaction'])
 
 
-class BaseFetcher(object):
-    def fetch(self, year, month, sid, retry):
+class TWSEFetcher:
+    REPORT_URL = urllib.parse.urljoin(TWSE_BASE_URL, 'exchangeReport/STOCK_DAY')
+
+    def __init__(self):
         pass
 
     def _convert_date(self, date):
         """Convert '106/05/01' to '2017/05/01'"""
         return '/'.join([str(int(date.split('/')[0]) + 1911)] + date.split('/')[1:])
 
-    def _make_datatuple(self, data):
-        pass
-
-    def purify(self, original_data):
-        pass
-
-
-class TWSEFetcher(BaseFetcher):
-    REPORT_URL = urllib.parse.urljoin(TWSE_BASE_URL, 'exchangeReport/STOCK_DAY')
-
-    def __init__(self):
-        pass
-
-    def fetch(self, year: int, month: int, sid: str, proxys, retry=5):
+    def fetch(self, year: int, month: int, sid: str, proxys, retry=3):
         params = {'date': '%d%02d01' % (year, month), 'stockNo': sid, 'response': 'json'}
-        # self.REPORT_URL = "http://www.twse.com.tw/exchangeReport/STOCK_DAY/?response=json&date={date}01&stockNo={" \
-        #                   "stockNo}".format(
-        #     date='%d%02d' % (year, month), stockNo=sid)
         i = 0
         while True:
             try:
                 rand = randint(0, len(proxys))
-                proxies = proxys[rand]  # , params=params
-                r = requests.get(self.REPORT_URL, timeout=3, params=params,
+                proxies = proxys[rand]
+                r = requests.get(self.REPORT_URL, timeout=1, params=params,
                                  headers=self.get_header(), proxies=proxies)
                 break
             except Exception:
-                if i > 10:
+                if i > 5:
                     print("fail")
                     return {'data': []}
                 i += 1
@@ -62,9 +49,12 @@ class TWSEFetcher(BaseFetcher):
             data = {'stat': '', 'data': []}
 
         if data['stat'] == 'OK':
-            data['data'] = self.purify(data)
+            print('code : ' + sid + 'get')
+            data['sid'] = sid
         else:
             data['data'] = []
+            print('code : ' + sid + 'empty')
+        data = json.dumps(data)
         return data
 
     def _make_datatuple(self, data):
@@ -83,10 +73,17 @@ class TWSEFetcher(BaseFetcher):
         return DATATUPLE(*data)
 
     def purify(self, original_data):
-        return [self._make_datatuple(d) for d in original_data['data']]
+        try:
+            return [self._make_datatuple(d) for d in original_data['data']]
+        except:
+            return []
 
     def get_header(self):
 
         User_Agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0'
         header = {'User-Agent': User_Agent}
         return header
+
+    def csv_output(self, param):
+
+        csv.DictWriter()
